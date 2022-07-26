@@ -1,18 +1,5 @@
 import { galleryItems } from './gallery-items.js';
 // Change code below this line
-// let gallery = new SimpleLightbox('.gallery a');
-// gallery.on('show.simplelightbox', function () {
-//   // Do something…
-// });
-
-// gallery.on('error.simplelightbox', function (e) {
-//   console.log(e); // Some usefull information
-// });
-
-// const gallery = new SimpleLightbox('.gallery a', {
-//   sourceAttr: 'href',
-//   captionsData: 'alt',
-// });
 
 const parentGalleryRef = document.querySelector('.gallery');
 const cardElementsMarkup = createGalleryCards(galleryItems);
@@ -24,7 +11,7 @@ function createGalleryCards(arr) {
     .map(
       ({ preview, original, description }) =>
         `<a class="gallery__item" href="${original}" >
-  <img class="gallery__image big" src="${preview}" alt="${description} " />
+  <img class="gallery__image" src="${preview}" alt="${description} " />
 </a>`
     )
     .join('');
@@ -38,18 +25,19 @@ function preventDefActionToLinks(parEl) {
   });
 }
 
-function onGalleryCardClick(e) {
-  if (e.target.nodeName !== 'IMG') {
-    return;
-  }
-  new SimpleLightbox('.gallery .gallery__item', {
-    captionsData: 'alt',
-    captionDelay: 250,
-    history: true,
-    fileExt: false,
-  });
-}
+const pic = new SimpleLightbox('.gallery .gallery__item', {
+  captionsData: 'alt',
+  captionDelay: 250,
+  history: false,
+  docClose: false,
+});
 
-parentGalleryRef.addEventListener('click', onGalleryCardClick);
-// console.log(cardElementsMarkup);
 // console.log(galleryItems);
+
+// const fruits = ['banana', 'orange', 'apple', 'orange', 'pear', 'banana'];
+
+// const result = fruits.reduce(
+//   (acc, el) => (acc[el] ? { ...acc, [el]: acc[el] + 1 } : { ...acc, [el]: 1 }),
+//   {}
+// );
+// console.log(result);
