@@ -1,43 +1,43 @@
 import { galleryItems } from './gallery-items.js';
 // Change code below this line
 
-const parentGalleryRef = document.querySelector('.gallery');
-const cardElementsMarkup = createGalleryCards(galleryItems);
-parentGalleryRef.insertAdjacentHTML('afterbegin', cardElementsMarkup);
-preventDefActionToLinks(parentGalleryRef);
+const parentGalleryEl = document.querySelector('.gallery');
+const markupGallery = createMarkupGallery(galleryItems);
 
-function createGalleryCards(arr) {
-  return arr
-    .map(
-      ({ preview, original, description }) =>
-        `<a class="gallery__item" href="${original}" >
-  <img class="gallery__image" src="${preview}" alt="${description} " />
-</a>`
-    )
-    .join('');
-}
+renderGalleryEls(markupGallery);
 
-function preventDefActionToLinks(parEl) {
-  parEl.querySelectorAll('.gallery__item').forEach(el => {
-    el.addEventListener('click', e => {
-      e.preventDefault();
-    });
+if ('loading' in HTMLImageElement.prototype) {
+  console.log('SUPPORT');
+  const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+  lazyImages.forEach(img => {
+    img.src = img.dataset.src;
   });
+} else {
+  console.log('NOT SUPPORT');
+  const myScript = document.querySelector('script[src="js/02-lightbox.js"]');
+  const lazySizesLibr = `  <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.3.2/lazysizes.min.js"
+      integrity="sha512-q583ppKrCRc7N5O0n2nzUiJ+suUv7Et1JGels4bXOaMFQcamPk9HjdUknZuuFjBNs7tsMuadge5k9RzdmO+1GQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>`;
+  myScript.insertAdjacentElement('beforebegin');
 }
 
-const pic = new SimpleLightbox('.gallery .gallery__item', {
+const modalPicture = new SimpleLightbox('.gallery a', {
+  overlayOpacity: 0.8,
   captionsData: 'alt',
   captionDelay: 250,
-  history: false,
-  docClose: false,
 });
 
-// console.log(galleryItems);
+function createMarkupGallery(items) {
+  return items.reduce((acc, { preview, original, description }) => {
+    return `${acc} <a class="gallery__item lazyload" href="${original}" ">
+  <img class="gallery__image" loading="lazy" data-src="${preview}" alt="${description}" />
+</a>`;
+  }, '');
+}
 
-// const fruits = ['banana', 'orange', 'apple', 'orange', 'pear', 'banana'];
-
-// const result = fruits.reduce(
-//   (acc, el) => (acc[el] ? { ...acc, [el]: acc[el] + 1 } : { ...acc, [el]: 1 }),
-//   {}
-// );
-// console.log(result);
+function renderGalleryEls(mark) {
+  parentGalleryEl.innerHTML = mark;
+}

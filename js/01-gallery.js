@@ -1,67 +1,63 @@
 import { galleryItems } from './gallery-items.js';
 // Change code below this line
 
-let instance;
-const parentGalleryRef = document.querySelector('.gallery');
-const galleryCardsMarkup = createGalleryCards(galleryItems);
-parentGalleryRef.innerHTML = galleryCardsMarkup;
+const parentGalleryEl = document.querySelector('.gallery');
+const markupGallery = createMarkupGallery(galleryItems);
+let modalPicture;
 
-function createGalleryCards(galleryItems) {
-  return galleryItems
-    .map(
-      ({ preview, original, description }) =>
-        `<div class="gallery__item">
+renderGalleryEls(markupGallery);
+preventDefForInnerLinks(parentGalleryEl);
+
+parentGalleryEl.addEventListener('click', onPreviewPictureClick);
+
+function createMarkupGallery(items) {
+  return items.reduce((acc, { preview, original, description }) => {
+    return ` ${acc}<div class="gallery__item">
   <a class="gallery__link" href="${original}">
     <img
-      class="gallery__image lazyload"
-      data-src="${preview}"
+      class="gallery__image"
+      src="${preview}"
       data-source="${original}"
       alt="${description}"
     />
   </a>
-</div>`
-    )
-    .join('');
+</div>`;
+  }, '');
 }
 
-function preventDefActionToLinks(parEl) {
-  parEl.querySelectorAll('a').forEach(e =>
-    e.addEventListener('click', e => {
+function renderGalleryEls(mark) {
+  parentGalleryEl.innerHTML = mark;
+}
+
+function preventDefForInnerLinks(parentEl) {
+  parentEl.querySelectorAll('.gallery__link').forEach(link =>
+    link.addEventListener('click', e => {
       e.preventDefault();
     })
   );
 }
 
-function onGalleryCardClick(e) {
-  if (!e.target.classList.contains('gallery__image')) {
+function onPreviewPictureClick(e) {
+  if (e.target.tagName !== 'IMG') {
     return;
   }
-
-  instance = basicLightbox.create(
+  (modalPicture = basicLightbox.create(
     `
-		<img class='gallery__image' width="1400" height="900" src="${event.target.dataset.source}">
-
-	`,
+    <img src="${e.target.dataset.source}" width="1200" height="900">
+`,
     {
-      closable: true,
-      onShow: instance => {
-        document.addEventListener('keydown', closingModalOnEscape);
-      },
-      onClose: instance => {
-        document.removeEventListener('keydown', closingModalOnEscape);
-      },
+      onShow: modalPicture =>
+        window.addEventListener('keydown', closeModalOnEsc),
+      onClose: modalPicture =>
+        window.removeEventListener('keydown', closeModalOnEsc),
     }
-  );
-  instance.show();
+  )),
+    modalPicture.show();
 }
 
-function closingModalOnEscape(e) {
-  if (e.code === 'Escape') {
-    instance.close();
+function closeModalOnEsc(e) {
+  if (e.code !== 'Escape') {
+    return;
   }
+  modalPicture.close();
 }
-
-preventDefActionToLinks(parentGalleryRef);
-parentGalleryRef.addEventListener('click', onGalleryCardClick);
-
-console.log(galleryItems);
